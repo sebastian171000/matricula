@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import Button from "../../shared/components/FormElements/Button";
 import Input from "../../shared/components/FormElements/Input";
@@ -13,12 +13,17 @@ import {
   VALIDATOR_NUMBER,
 } from "../../shared/util/validators";
 import "../../shared/components/FormElements/PlaceForm.css";
-import DUMMY_CURSOS from "../../shared/util/dummy_cursos";
 import Card from "../../shared/components/UIElements/Card";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 const UpdateProfesor = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedCurso, setLoadedCurso] = useState();
+
   const { cursoId } = useParams();
+  const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
       codigo: {
@@ -40,112 +45,148 @@ const UpdateProfesor = () => {
     },
     false
   );
-  const identifiedCurso = DUMMY_CURSOS.find((curso) => cursoId === curso._id);
+  //const identifiedCurso = DUMMY_CURSOS.find((curso) => cursoId === curso._id);
   useEffect(() => {
-    if (identifiedCurso) {
-      setFormData(
-        {
-          codigo: {
-            value: identifiedCurso.codigo,
-            isValid: true,
+    const fetchCursos = async () => {
+      try {
+        const responseData = await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + `/cursos/${cursoId}`
+        );
+        setLoadedCurso(responseData.curso);
+        setFormData(
+          {
+            codigo: {
+              value: responseData.curso.codigo,
+              isValid: true,
+            },
+            ciclo: {
+              value: responseData.curso.ciclo,
+              isValid: true,
+            },
+            nombre: {
+              value: responseData.curso.nombre,
+              isValid: true,
+            },
+            creditos: {
+              value: responseData.curso.creditos,
+              isValid: true,
+            },
           },
-          ciclo: {
-            value: identifiedCurso.ciclo,
-            isValid: true,
-          },
-          nombre: {
-            value: identifiedCurso.nombre,
-            isValid: true,
-          },
-          creditos: {
-            value: identifiedCurso.creditos,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedCurso]);
+          true
+        );
+      } catch (err) {}
+    };
+    fetchCursos();
+  }, [sendRequest, cursoId, setFormData]);
 
-  const placeSubmitHandler = (event) => {
+  const placeSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs); // send this to the backend!
+    try {
+      await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + `/cursos/${cursoId}`,
+        "PATCH",
+        JSON.stringify({
+          codigo: formState.inputs.codigo.value,
+          ciclo: formState.inputs.ciclo.value,
+          nombre: formState.inputs.nombre.value,
+          creditos: formState.inputs.creditos.value,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      history.push("/curso");
+    } catch (err) {}
   };
-  if (!identifiedCurso) {
+
+  if (isLoading) {
+    return (
+      <div style={{ position: "relative" }} className="center">
+        <LoadingSpinner asOverlay />
+      </div>
+    );
+  }
+
+  if (!loadedCurso && !error) {
     return (
       <div className="center">
         <Card>
-          <h2>No pudimos identificar el Curso!</h2>
+          <h2>No pudimos identificar el curso!</h2>
         </Card>
       </div>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="center">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
   return (
-    <section className="main-content form">
-      <form className="place-form" onSubmit={placeSubmitHandler}>
-        <Input
-          id="codigo"
-          element="input"
-          type="text"
-          label="Codigo"
-          validators={[
-            VALIDATOR_MINLENGTH(5),
-            VALIDATOR_MAXLENGTH(5),
-            VALIDATOR_NO_ESPECIAL_CHARACTER(),
-          ]}
-          errorText="Debe de ser de 5 caracteres no especiales."
-          onInput={inputHandler}
-          initialValue={formState.inputs.codigo.value}
-          initialValid={formState.inputs.codigo.isValid}
-        />
-        <Input
-          id="ciclo"
-          element="input"
-          type="number"
-          label="Ciclo Académico"
-          validators={[VALIDATOR_NUMBER(), VALIDATOR_MIN(1), VALIDATOR_MAX(14)]}
-          errorText="Sólo números del 1 al 14."
-          onInput={inputHandler}
-          initialValue={formState.inputs.ciclo.value}
-          initialValid={formState.inputs.ciclo.isValid}
-        />
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      <section className="main-content form">
+        {!isLoading && loadedCurso && (
+          <form className="place-form" onSubmit={placeSubmitHandler}>
+            <Input
+              id="codigo"
+              element="input"
+              type="text"
+              label="Codigo"
+              validators={[
+                VALIDATOR_MINLENGTH(5),
+                VALIDATOR_MAXLENGTH(5),
+                VALIDATOR_NO_ESPECIAL_CHARACTER(),
+              ]}
+              errorText="Debe de ser de 5 caracteres no especiales."
+              onInput={inputHandler}
+              initialValue={loadedCurso.codigo}
+              initialValid={true}
+            />
+            <Input
+              id="ciclo"
+              element="input"
+              type="number"
+              label="Ciclo Académico"
+              validators={[
+                VALIDATOR_NUMBER(),
+                VALIDATOR_MIN(1),
+                VALIDATOR_MAX(14),
+              ]}
+              errorText="Sólo números del 1 al 14."
+              onInput={inputHandler}
+              initialValue={loadedCurso.ciclo}
+              initialValid={true}
+            />
 
-        <Input
-          id="nombre"
-          element="input"
-          label="Nombre"
-          validators={[VALIDATOR_MINLENGTH(5), VALIDATOR_MAXLENGTH(100)]}
-          errorText="Tiene que tener 5 a 100 caracteres"
-          onInput={inputHandler}
-          initialValue={formState.inputs.nombre.value}
-          initialValid={formState.inputs.nombre.isValid}
-        />
-        <Input
-          id="creditos"
-          element="input"
-          type="number"
-          label="Creditos"
-          validators={[VALIDATOR_NUMBER(), VALIDATOR_MIN(3), VALIDATOR_MAX(6)]}
-          errorText="Sólo números del 3 al 6"
-          onInput={inputHandler}
-          initialValue={formState.inputs.creditos.value}
-          initialValid={formState.inputs.creditos.isValid}
-        />
+            <Input
+              id="nombre"
+              element="input"
+              label="Nombre"
+              validators={[VALIDATOR_MINLENGTH(5), VALIDATOR_MAXLENGTH(100)]}
+              errorText="Tiene que tener 5 a 100 caracteres"
+              onInput={inputHandler}
+              initialValue={loadedCurso.nombre}
+              initialValid={true}
+            />
+            <Input
+              id="creditos"
+              element="input"
+              type="number"
+              label="Creditos"
+              validators={[
+                VALIDATOR_NUMBER(),
+                VALIDATOR_MIN(3),
+                VALIDATOR_MAX(6),
+              ]}
+              errorText="Sólo números del 3 al 6"
+              onInput={inputHandler}
+              initialValue={loadedCurso.creditos}
+              initialValid={true}
+            />
 
-        <Button type="submit" disabled={!formState.isValid}>
-          AÑADIR CURSO
-        </Button>
-      </form>
-    </section>
+            <Button type="submit" disabled={!formState.isValid}>
+              ACTUALIZAR CURSO
+            </Button>
+          </form>
+        )}
+      </section>
+    </>
   );
 };
 

@@ -5,7 +5,6 @@ import Card from "../../shared/components/UIElements/Card";
 import MatriculaHorarioFinalRegistro from "./MatriculaHorarioFinalRegistro";
 
 const MatriculaHorarioFinal = (props) => {
-  console.log(props.horario);
   return (
     <Card>
       <ul className="header--horario">

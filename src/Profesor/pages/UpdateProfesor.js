@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import Button from "../../shared/components/FormElements/Button";
 import Input from "../../shared/components/FormElements/Input";
@@ -13,12 +13,19 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import "../../shared/components/FormElements/PlaceForm.css";
-import DUMMY_PROFESORES from "../../shared/util/dummy_profesores";
+
 import Card from "../../shared/components/UIElements/Card";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 const UpdateProfesor = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedProfesor, setLoadedProfesor] = useState();
+
   const { profesorId } = useParams();
+  const history = useHistory();
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       nombres: {
@@ -60,207 +67,235 @@ const UpdateProfesor = () => {
     },
     false
   );
-  const identifiedProfesor = DUMMY_PROFESORES.find(
-    (profesor) => profesorId === profesor._id
-  );
   useEffect(() => {
-    if (identifiedProfesor) {
-      setFormData(
-        {
-          nombres: {
-            value: identifiedProfesor.nombres,
-            isValid: true,
+    const fetchProfesores = async () => {
+      try {
+        const responseData = await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + `/profesores/${profesorId}`
+        );
+        setLoadedProfesor(responseData.profesor);
+        setFormData(
+          {
+            nombres: {
+              value: responseData.profesor.nombres,
+              isValid: true,
+            },
+            apellidos: {
+              value: responseData.profesor.apellidos,
+              isValid: true,
+            },
+            email: {
+              value: responseData.profesor.email,
+              isValid: true,
+            },
+            tipoDoc: {
+              value: responseData.profesor.tipoDoc,
+              isValid: true,
+            },
+            documento: {
+              value: responseData.profesor.documento,
+              isValid: true,
+            },
+            sexo: {
+              value: responseData.profesor.sexo,
+              isValid: true,
+            },
+            telefono: {
+              value: responseData.profesor.telefono,
+              isValid: true,
+            },
+            direccion: {
+              value: responseData.profesor.direccion,
+              isValid: true,
+            },
+            linkedin: {
+              value: responseData.profesor.linkedin,
+              isValid: true,
+            },
           },
-          apellidos: {
-            value: identifiedProfesor.apellidos,
-            isValid: true,
-          },
-          email: {
-            value: identifiedProfesor.email,
-            isValid: true,
-          },
-          tipoDoc: {
-            value: identifiedProfesor.tipoDoc,
-            isValid: true,
-          },
-          documento: {
-            value: identifiedProfesor.documento,
-            isValid: true,
-          },
-          sexo: {
-            value: identifiedProfesor.sexo,
-            isValid: true,
-          },
-          telefono: {
-            value: identifiedProfesor.telefono,
-            isValid: true,
-          },
-          direccion: {
-            value: identifiedProfesor.direccion,
-            isValid: true,
-          },
-          linkedin: {
-            value: identifiedProfesor.linkedin,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedProfesor]);
-
-  const placeSubmitHandler = (event) => {
+          true
+        );
+      } catch (err) {}
+    };
+    fetchProfesores();
+  }, [sendRequest, profesorId, setFormData]);
+  const placeSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs); // send this to the backend!
+    try {
+      await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + `/profesores/${profesorId}`,
+        "PATCH",
+        JSON.stringify({
+          nombres: formState.inputs.nombres.value,
+          apellidos: formState.inputs.apellidos.value,
+          email: formState.inputs.email.value,
+          tipoDoc: formState.inputs.tipoDoc.value,
+          documento: formState.inputs.documento.value,
+          sexo: formState.inputs.sexo.value,
+          telefono: formState.inputs.telefono.value,
+          direccion: formState.inputs.direccion.value,
+          linkedin: formState.inputs.linkedin.value,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      history.push("/profesor");
+    } catch (err) {}
   };
-  if (!identifiedProfesor) {
+  if (isLoading) {
+    return (
+      <div className="center">
+        <LoadingSpinner asOverlay />
+      </div>
+    );
+  }
+
+  if (!loadedProfesor && !error) {
     return (
       <div className="center">
         <Card>
-          <h2>Could not find profesor!</h2>
+          <h2>No pudimos identificar al profesor!</h2>
         </Card>
       </div>
     );
   }
-
-  if (isLoading) {
-    return (
-      <div className="center">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
   return (
-    <section className="main-content form">
-      <form className="place-form" onSubmit={placeSubmitHandler}>
-        <Input
-          id="nombres"
-          element="input"
-          type="text"
-          label="Nombres"
-          validators={[
-            VALIDATOR_MINLENGTH(3),
-            VALIDATOR_MAXLENGTH(100),
-            VALIDATOR_NO_ESPECIAL_CHARACTER(),
-          ]}
-          errorText="Entre 3 y 100 caracters no especiales."
-          onInput={inputHandler}
-          initialValue={formState.inputs.nombres.value}
-          initialValid={formState.inputs.nombres.isValid}
-        />
-        <Input
-          id="apellidos"
-          element="input"
-          label="Apellidos"
-          validators={[
-            VALIDATOR_MINLENGTH(3),
-            VALIDATOR_MAXLENGTH(100),
-            VALIDATOR_NO_ESPECIAL_CHARACTER(),
-          ]}
-          errorText="Entre 3 y 100 caracters no especiales."
-          onInput={inputHandler}
-          initialValue={formState.inputs.apellidos.value}
-          initialValid={formState.inputs.apellidos.isValid}
-        />
-        <Input
-          id="email"
-          element="input"
-          label="Correo"
-          validators={[VALIDATOR_EMAIL(), VALIDATOR_MAXLENGTH(30)]}
-          errorText="Tiene que tener el fomato de un correo y máximo 30 caracters"
-          onInput={inputHandler}
-          initialValue={formState.inputs.email.value}
-          initialValid={formState.inputs.email.isValid}
-        />
-        <Input
-          id="tipoDoc"
-          element="select"
-          options={[
-            { value: "dni", text: "DNI" },
-            { value: "pasaporte", text: "Pasaporte" },
-            { value: "extranjeria", text: "Carnet de extranjería" },
-          ]}
-          label="Tipo de Documento"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.tipoDoc.value}
-          initialValid={formState.inputs.tipoDoc.isValid}
-        />
-        <Input
-          id="documento"
-          element="input"
-          type="text"
-          label="Número de documento"
-          validators={[
-            VALIDATOR_MINLENGTH(8),
-            VALIDATOR_MAXLENGTH(12),
-            VALIDATOR_NUMBER(),
-          ]}
-          errorText="Entre 8 y 12 caracters no especiales."
-          onInput={inputHandler}
-          initialValue={formState.inputs.documento.value}
-          initialValid={formState.inputs.documento.isValid}
-        />
-        <Input
-          id="sexo"
-          element="select"
-          options={[
-            { value: "M", text: "M" },
-            { value: "F", text: "F" },
-          ]}
-          label="Sexo"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.sexo.value}
-          initialValid={formState.inputs.sexo.isValid}
-        />
-        <Input
-          id="telefono"
-          element="input"
-          type="text"
-          label="Teléfono"
-          validators={[
-            VALIDATOR_NUMBER(),
-            VALIDATOR_MINLENGTH(9),
-            VALIDATOR_MAXLENGTH(13),
-          ]}
-          errorText="Entre 9 y 13 digitos."
-          onInput={inputHandler}
-          initialValue={formState.inputs.telefono.value}
-          initialValid={formState.inputs.telefono.isValid}
-        />
-        <Input
-          id="direccion"
-          element="input"
-          type="text"
-          label="Dirección"
-          validators={[VALIDATOR_REQUIRE(), VALIDATOR_MAXLENGTH(100)]}
-          errorText="Entre 0 y 100 caracteres."
-          onInput={inputHandler}
-          initialValue={formState.inputs.direccion.value}
-          initialValid={formState.inputs.direccion.isValid}
-        />
+    <>
+      <ErrorModal error={error} onClear={clearError} />
 
-        <Input
-          id="linkedin"
-          element="input"
-          type="text"
-          label="Linkedin"
-          validators={[]}
-          errorText="Sólo números del 1 al 14."
-          onInput={inputHandler}
-          initialValue={formState.inputs.linkedin.value}
-          initialValid
-        />
+      <section className="main-content form">
+        {!isLoading && loadedProfesor && (
+          <form className="place-form" onSubmit={placeSubmitHandler}>
+            <Input
+              id="nombres"
+              element="input"
+              type="text"
+              label="Nombres"
+              validators={[
+                VALIDATOR_MINLENGTH(3),
+                VALIDATOR_MAXLENGTH(100),
+                VALIDATOR_NO_ESPECIAL_CHARACTER(),
+              ]}
+              errorText="Entre 3 y 100 caracters no especiales."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.nombres}
+              initialValid={true}
+            />
+            <Input
+              id="apellidos"
+              element="input"
+              label="Apellidos"
+              validators={[
+                VALIDATOR_MINLENGTH(3),
+                VALIDATOR_MAXLENGTH(100),
+                VALIDATOR_NO_ESPECIAL_CHARACTER(),
+              ]}
+              errorText="Entre 3 y 100 caracters no especiales."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.apellidos}
+              initialValid={true}
+            />
+            <Input
+              id="email"
+              element="input"
+              label="Correo"
+              validators={[VALIDATOR_EMAIL(), VALIDATOR_MAXLENGTH(30)]}
+              errorText="Tiene que tener el fomato de un correo y máximo 30 caracters"
+              onInput={inputHandler}
+              initialValue={loadedProfesor.email}
+              initialValid={true}
+            />
+            <Input
+              id="tipoDoc"
+              element="select"
+              options={[
+                { value: "dni", text: "DNI" },
+                { value: "pasaporte", text: "Pasaporte" },
+                { value: "extranjeria", text: "Carnet de extranjería" },
+              ]}
+              label="Tipo de Documento"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedProfesor.tipoDoc}
+              initialValid={true}
+            />
+            <Input
+              id="documento"
+              element="input"
+              type="text"
+              label="Número de documento"
+              validators={[
+                VALIDATOR_MINLENGTH(8),
+                VALIDATOR_MAXLENGTH(12),
+                VALIDATOR_NUMBER(),
+              ]}
+              errorText="Entre 8 y 12 caracters no especiales."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.documento}
+              initialValid={true}
+            />
+            <Input
+              id="sexo"
+              element="select"
+              options={[
+                { value: "M", text: "M" },
+                { value: "F", text: "F" },
+              ]}
+              label="Sexo"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedProfesor.sexo}
+              initialValid={true}
+            />
+            <Input
+              id="telefono"
+              element="input"
+              type="text"
+              label="Teléfono"
+              validators={[
+                VALIDATOR_NUMBER(),
+                VALIDATOR_MINLENGTH(9),
+                VALIDATOR_MAXLENGTH(13),
+              ]}
+              errorText="Entre 9 y 13 digitos."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.telefono}
+              initialValid={true}
+            />
+            <Input
+              id="direccion"
+              element="input"
+              type="text"
+              label="Dirección"
+              validators={[VALIDATOR_REQUIRE(), VALIDATOR_MAXLENGTH(100)]}
+              errorText="Entre 1 y 100 caracteres."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.direccion}
+              initialValid={true}
+            />
 
-        <Button type="submit" disabled={!formState.isValid}>
-          ACTUALIZAR PROFESOR
-        </Button>
-      </form>
-    </section>
+            <Input
+              id="linkedin"
+              element="input"
+              type="text"
+              label="Linkedin"
+              validators={[]}
+              errorText="Sólo números del 1 al 14."
+              onInput={inputHandler}
+              initialValue={loadedProfesor.linkedin}
+              initialValid
+            />
+
+            <Button type="submit" disabled={!formState.isValid}>
+              ACTUALIZAR PROFESOR
+            </Button>
+          </form>
+        )}
+      </section>
+    </>
   );
 };
 

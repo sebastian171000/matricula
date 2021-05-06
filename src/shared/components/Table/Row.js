@@ -15,8 +15,23 @@ const Row = (props) => {
   };
 
   let modalContent = Object.keys(props.row).map((key) => {
+    if (key === "password") return null;
     if (key === "_id") return null;
-
+    if (key === "secciones") return null;
+    if (key === "profesor")
+      return (
+        <li key={key}>
+          <strong>{props.labelsModal[key]}</strong>
+          <p>{`${props.row[key].nombres} ${props.row[key].apellidos}`}</p>
+        </li>
+      );
+    if (key === "curso")
+      return (
+        <li key={key}>
+          <strong>{props.labelsModal[key]}</strong>
+          <p>{props.row[key].nombre}</p>
+        </li>
+      );
     if (key === "linkedin")
       return (
         <li key={key}>
@@ -40,6 +55,7 @@ const Row = (props) => {
           <p>{props.row[key] ? "Activo" : "Inactivo"}</p>
         </li>
       );
+
     return (
       <li key={key}>
         <strong>{props.labelsModal[key]}</strong> <p>{props.row[key]}</p>
@@ -47,6 +63,18 @@ const Row = (props) => {
     );
   });
   const rows = props.tableKeys.map((key) => {
+    if (key === "curso")
+      return (
+        <td key={key} style={{ width: `calc(100% / ${props.nItems})` }}>
+          {props.row[key].nombre}
+        </td>
+      );
+    if (key === "profesor")
+      return (
+        <td key={key} style={{ width: `calc(100% / ${props.nItems})` }}>
+          {`${props.row[key].nombres} ${props.row[key].apellidos}`}
+        </td>
+      );
     if (key === "estado" && props.statusType === "M")
       return (
         <td key={key} style={{ width: `calc(100% / ${props.nItems})` }}>

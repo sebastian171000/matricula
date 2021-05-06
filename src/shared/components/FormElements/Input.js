@@ -51,18 +51,34 @@ const Input = (props) => {
   };
 
   let element;
+  let inputPrint;
+  if(props.type === 'number'){
+    inputPrint =(
+      <input
+        id={props.id}
+        type={props.type}
+        min={0}
+        placeholder={props.placeholder}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={inputState.value}
+      />
+    );
+  }else{
+    inputPrint =(
+      <input
+        id={props.id}
+        type={props.type}
+        placeholder={props.placeholder}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={inputState.value}
+      />
+    );
+  }
   switch (props.element) {
     case "input":
-      element = (
-        <input
-          id={props.id}
-          type={props.type}
-          placeholder={props.placeholder}
-          onChange={changeHandler}
-          onBlur={touchHandler}
-          value={inputState.value}
-        />
-      );
+      element = inputPrint;
       break;
     case "textarea":
       element = (

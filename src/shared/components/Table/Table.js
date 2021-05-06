@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./Header";
 import Row from "./Row";
+import LoadingSpinner from "../UIElements/LoadingSpinner";
 
 import "./Table.css";
 
@@ -24,7 +25,11 @@ const AlumnoTable = (props) => {
         </table>
       </div>
 
-      <div className="table100-body js-pscroll">
+      <div
+        className="table100-body js-pscroll"
+        style={{ position: "relative" }}
+      >
+        {props.isLoading && <LoadingSpinner asOverlay />}
         <table>
           <tbody>
             {props.page.map((row) => (

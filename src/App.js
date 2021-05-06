@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -12,7 +12,6 @@ import Matricula from "./Alumno/pages/Matricula";
 import Profesores from "./Profesor/pages/Profesores";
 import Secciones from "./Seccion/pages/Secciones";
 import Auth from "./Admin/pages/Auth/Auth";
-import Error from "./Error";
 import TopNavigation from "./shared/components/Navigation/TopNavigation";
 import LeftNavigation from "./shared/components/Navigation/LeftNavigation";
 import NewAlumno from "./Alumno/pages/NewAlumno";
@@ -28,29 +27,76 @@ import UpdateCurso from "./Curso/pages/UpdateCurso";
 import Cursos from "./Curso/pages/Cursos";
 import NewCurso from "./Curso/pages/NewCurso";
 import { AuthContext } from "./shared/context/auth-context";
+import Reportes from "./reporte/Reportes";
+let logoutTimer;
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const login = useCallback(() => {
-    setIsLoggedIn(true);
+  const [token, setToken] = useState(false);
+  const [tokenExpirationDate, setTokenExpirationDate] = useState();
+  const [user, setUser] = useState(false);
+
+  const login = useCallback((admin, token, expirationDate) => {
+    setToken(token);
+    setUser(admin);
+    const tokenExpirationDate =
+      expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
+    setTokenExpirationDate(tokenExpirationDate);
+    localStorage.setItem(
+      "adminData",
+      JSON.stringify({
+        admin,
+        token,
+        expiration: tokenExpirationDate.toISOString(),
+      })
+    );
   }, []);
   const logout = useCallback(() => {
-    setIsLoggedIn(false);
+    setToken(null);
+    setTokenExpirationDate(null);
+    setUser(null);
+    localStorage.removeItem("adminData");
   }, []);
+
+  useEffect(() => {
+    if (token && tokenExpirationDate) {
+      const remainingTime = tokenExpirationDate.getTime() - new Date();
+      logoutTimer = setTimeout(logout, remainingTime);
+    } else {
+      clearTimeout(logoutTimer);
+    }
+  }, [token, logout, tokenExpirationDate]);
+
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("adminData"));
+    if (
+      storedData &&
+      storedData.token &&
+      new Date(storedData.expiration) > new Date()
+    ) {
+      login(
+        storedData.admin,
+        storedData.token,
+        new Date(storedData.expiration)
+      );
+    }
+  }, [login]);
+
   let routes;
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
         {/* ADMIN ROUTES */}
+
         <Route path="/admin" exact>
-          <Administradores />
+          {user && user.permiso === "principal" && <Administradores />}
         </Route>
         <Route path="/admin/new" exact>
-          <NewAdministrador />
+          {user && user.permiso === "principal" && <NewAdministrador />}
         </Route>
         <Route path="/admin/update/:adminId" exact>
-          <UpdateAdministrador />
+          {user && user.permiso === "principal" && <UpdateAdministrador />}
         </Route>
+
         {/* ALUMNO ROUTES */}
         <Route path="/alumno" exact>
           <Alumnos />
@@ -94,6 +140,10 @@ function App() {
         <Route path="/curso/update/:cursoId" exact>
           <UpdateCurso />
         </Route>
+        {/* SECCION CURSO */}
+        <Route path="/reporte" exact>
+          <Reportes />
+        </Route>
         <Redirect to="/alumno" />
       </Switch>
     );
@@ -111,15 +161,17 @@ function App() {
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn,
+        isLoggedIn: !!token,
+        token,
         login,
         logout,
+        user,
       }}
     >
       <Router>
-        {isLoggedIn && <TopNavigation />}
-        <div className={isLoggedIn && "container-main-content"}>
-          {isLoggedIn && <LeftNavigation />}
+        {token && <TopNavigation />}
+        <div className={token && "container-main-content"}>
+          {token && <LeftNavigation />}
           <Switch>{routes}</Switch>
         </div>
       </Router>

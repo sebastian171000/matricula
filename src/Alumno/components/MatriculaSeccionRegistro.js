@@ -7,10 +7,10 @@ const MatriculaSeccionRegistro = (props) => {
   return (
     <ul className="registro--seccion">
       <li>{props.seccion.codigo}</li>
-      <li>{props.seccion.profesor}</li>
+      <li>{`${props.seccion.profesor.nombres} ${props.seccion.profesor.apellidos}`}</li>
       <li>{props.seccion.dia}</li>
       <li>{props.seccion.hora}</li>
-      <li>{props.seccion.vacantes}</li>
+
       <li>
         <i onClick={addSeccionToHorario} className="fas fa-plus"></i>
       </li>

@@ -5,10 +5,16 @@ import TopNavigation from "../../../shared/components/Navigation/TopNavigation";
 import Button from "../../../shared/components/FormElements/Button";
 import Input from "../../../shared/components/FormElements/Input";
 import { AuthContext } from "../../../shared/context/auth-context";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../../shared/hooks/http-hook";
+
 import classes from "./Auth.module.css";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
   const [formState, inputHandler] = useForm(
     {
       username: {
@@ -23,19 +29,34 @@ const Auth = () => {
     true
   );
 
-  const placeSubmitHandler = (event) => {
+  const placeSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs); // send this to the backend!
-    auth.login();
+    try {
+      console.log(process.env.REACT_APP_BACKEND_URL + "/admins/login");
+      const responseData = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/admins/login",
+        "POST",
+        JSON.stringify({
+          username: formState.inputs.username.value,
+          password: formState.inputs.password.value,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      auth.login(responseData.admin, responseData.token);
+    } catch (error) {}
   };
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       <TopNavigation
         className={classes.TopNavigation}
         customRightItem={
           <div className={classes.Recuperar}>
-            <p>Olvidaste tu contraseña?</p>
-            <a href="/">Recuperar</a>
+            {/* <p>Olvidaste tu contraseña?</p>
+            <a href="/">Recuperar</a> */}
           </div>
         }
         hideRightItem
@@ -63,7 +84,7 @@ const Auth = () => {
             validators={[]}
           />
 
-          <Button className={"custom"} type="submit">
+          <Button className="custom" type="submit">
             Entrar a Matricula Online
           </Button>
         </form>

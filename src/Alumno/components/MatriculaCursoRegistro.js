@@ -2,7 +2,7 @@ import React from "react";
 
 const MatriculaCursoRegistro = (props) => {
   const openHorario = (e) => {
-    props.onSaveVerSeccionData(props.curso);
+    props.onSaveVerSeccionData(props.curso._id);
     document.querySelectorAll(".registro--curso i").forEach((icon) => {
       icon.style.color = "black";
       icon.style.zoom = 1;

@@ -37,4 +37,5 @@ code {
 .main-content {
   background-color: #ececec;
   padding: 0 2rem;
+  position: relative;
 }

@@ -29,16 +29,24 @@ const LeftNavigation = (props) => {
           Secciones
         </li>
       </NavLink>
-      <NavLink to="/admin">
-        <li>
-          <i className="fas fa-user-cog"></i>
-          Administradores
-        </li>
-      </NavLink>
+      {auth.user && auth.user.permiso === "principal" && (
+        <NavLink to="/admin">
+          <li>
+            <i className="fas fa-user-cog"></i>
+            Administradores
+          </li>
+        </NavLink>
+      )}
       <NavLink to="/curso">
         <li>
           <i className="fas fa-book"></i>
           Cursos
+        </li>
+      </NavLink>
+      <NavLink to="/reporte">
+        <li>
+          <i className="far fa-chart-bar"></i>
+          Reportes
         </li>
       </NavLink>
 

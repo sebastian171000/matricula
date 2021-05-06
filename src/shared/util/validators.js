@@ -48,10 +48,10 @@ export const validate = (value, validators) => {
       isValid = isValid && +value <= validator.val;
     }
     if (validator.type === VALIDATOR_TYPE_EMAIL) {
-      isValid = isValid && /^\S+@\S+\.\S+$/.test(value);
+      isValid = isValid && /^\S+@gmail+\.\S+$/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_NO_SPECIAL_CHARACTER) {
-      isValid = isValid && !/[!@#$%^&*()_+\-=\][/{};':"\\|,.<>?]+/.test(value);
+      isValid = isValid && !/[0-9!@#$%^&*()_+\-=\][/{};':"\\|,.<>?]+/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_NUMBER) {
       isValid = isValid && /^\d+$/.test(value);

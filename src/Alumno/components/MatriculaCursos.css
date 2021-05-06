@@ -44,28 +44,28 @@
 /* seccion */
 .header--seccion li:nth-child(1),
 .registro--seccion li:nth-child(1) {
-  width: 16.7%;
+  width: 20%;
 }
 .header--seccion li:nth-child(2),
 .registro--seccion li:nth-child(2) {
-  width: 16.7%;
+  width: 20%;
 }
 .header--seccion li:nth-child(3),
 .registro--seccion li:nth-child(3) {
-  width: 16.7%;
+  width: 20%;
 }
 .header--seccion li:nth-child(4),
 .registro--seccion li:nth-child(4) {
-  width: 16.7%;
+  width: 20%;
 }
 .header--seccion li:nth-child(5),
 .registro--seccion li:nth-child(5) {
-  width: 16.7%;
+  width: 20%;
 }
-.header--seccion li:nth-child(6),
+/* .header--seccion li:nth-child(6),
 .registro--seccion li:nth-child(6) {
   width: 16.7%;
-}
+} */
 /* HORARIO */
 .header--horario li:nth-child(1),
 .registro--horario li:nth-child(1) {

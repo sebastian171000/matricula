@@ -5,7 +5,7 @@ const MatriculaHorarioFinalRegistro = (props) => {
   return (
     <ul className="registro--horario">
       <li>{props.seccion.codigo}</li>
-      <li>{props.seccion.curso}</li>
+      <li>{props.seccion.curso.nombre}</li>
       <li>
         <i onClick={removeSeccionToHorario} className="fas fa-minus"></i>
       </li>

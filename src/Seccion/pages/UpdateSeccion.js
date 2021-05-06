@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import Button from "../../shared/components/FormElements/Button";
 import Input from "../../shared/components/FormElements/Input";
@@ -11,13 +11,19 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 
-import DUMMY_SECCIONES from "../../shared/util/dummy_secciones";
 import Card from "../../shared/components/UIElements/Card";
 import "../../shared/components/FormElements/PlaceForm.css";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 const UpdateSeccion = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [cursos, setCursos] = useState();
+  const [profesores, setProfesores] = useState();
+  const [loadedSeccion, setLoadedSeccion] = useState();
   const { seccionId } = useParams();
+  const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
       codigo: {
@@ -49,171 +55,219 @@ const UpdateSeccion = () => {
     false
   );
 
-  const identifiedSeccion = DUMMY_SECCIONES.find(
-    (seccion) => seccionId === seccion._id
-  );
   useEffect(() => {
-    if (identifiedSeccion) {
-      setFormData(
-        {
-          codigo: {
-            value: identifiedSeccion.codigo,
-            isValid: true,
+    const fetchSecciones = async () => {
+      try {
+        const responseData = await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + `/secciones/${seccionId}`
+        );
+        setLoadedSeccion(responseData.seccion);
+        setFormData(
+          {
+            codigo: {
+              value: responseData.seccion.codigo,
+              isValid: true,
+            },
+            modalidad: {
+              value: responseData.seccion.modalidad,
+              isValid: true,
+            },
+            dia: {
+              value: responseData.seccion.dia,
+              isValid: true,
+            },
+            hora: {
+              value: responseData.seccion.hora,
+              isValid: true,
+            },
+            profesor: {
+              value: `${responseData.seccion.profesor.nombres} ${responseData.seccion.profesor.apellidos}`,
+              isValid: true,
+            },
+            curso: {
+              value: responseData.seccion.curso.nombre,
+              isValid: true,
+            },
           },
-          modalidad: {
-            value: identifiedSeccion.modalidad,
-            isValid: true,
-          },
-          dia: {
-            value: identifiedSeccion.dia,
-            isValid: true,
-          },
-          hora: {
-            value: identifiedSeccion.hora,
-            isValid: true,
-          },
-          profesor: {
-            value: identifiedSeccion.profesor,
-            isValid: true,
-          },
-          curso: {
-            value: identifiedSeccion.curso,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedSeccion]);
+          true
+        );
+      } catch (err) {}
+    };
+    const fetchCursos = async () => {
+      try {
+        const responseData = await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/cursos/"
+        );
+        setCursos(responseData.cursos.filter((curso) => curso.estado));
+      } catch (error) {}
+    };
+    const fetchProfesores = async () => {
+      try {
+        const responseData = await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/profesores/"
+        );
+        setProfesores(
+          responseData.profesores.filter((profesor) => profesor.estado)
+        );
+      } catch (error) {}
+    };
+    (async function(){
+      await fetchSecciones();
+      await fetchCursos();
+      await fetchProfesores();
+    })();
 
-  const placeSubmitHandler = (event) => {
+    
+  }, [sendRequest, seccionId, setFormData]);
+
+  const placeSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs); // send this to the backend!
+    try {
+      await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + `/secciones/${seccionId}`,
+        "PATCH",
+        JSON.stringify({
+          codigo: formState.inputs.codigo.value,
+          modalidad: formState.inputs.modalidad.value,
+          dia: formState.inputs.dia.value,
+          hora: formState.inputs.hora.value,
+          profesor: formState.inputs.profesor.value,
+          curso: formState.inputs.curso.value,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      history.push("/seccion");
+    } catch (err) {}
   };
 
-  if (!identifiedSeccion) {
+  if (isLoading) {
+    return (
+      <div style={{ position: "relative" }} className="center">
+        <LoadingSpinner asOverlay />
+      </div>
+    );
+  }
+
+  if (!loadedSeccion && !error) {
     return (
       <div className="center">
         <Card>
-          <h2>Could not find alumno!</h2>
+          <h2>No pudimos identificar la sección!</h2>
         </Card>
       </div>
     );
   }
-
-  if (isLoading) {
-    return (
-      <div className="center">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
   return (
-    <section className="main-content form">
-      <form className="place-form" onSubmit={placeSubmitHandler}>
-        <Input
-          id="codigo"
-          element="input"
-          type="text"
-          label="Codigo"
-          validators={[
-            VALIDATOR_MINLENGTH(5),
-            VALIDATOR_MAXLENGTH(5),
-            VALIDATOR_NO_ESPECIAL_CHARACTER(),
-          ]}
-          errorText="Debe de ser de 5 caracteres no especiales."
-          onInput={inputHandler}
-          initialValue={formState.inputs.codigo.value}
-          initialValid={formState.inputs.codigo.isValid}
-        />
-        <Input
-          id="modalidad"
-          element="select"
-          options={[
-            { value: "presencial", text: "Presencial" },
-            { value: "virtual", text: "Virtual" },
-          ]}
-          label="Modalidad"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.modalidad.value}
-          initialValid={formState.inputs.modalidad.isValid}
-        />
-        <Input
-          id="dia"
-          element="select"
-          options={[
-            { value: "lunes", text: "Lunes" },
-            { value: "martes", text: "Martes" },
-            { value: "miercoles", text: "Miercoles" },
-            { value: "jueves", text: "Jueves" },
-            { value: "viernes", text: "Viernes" },
-            { value: "sabado", text: "Sabado" },
-          ]}
-          label="Día"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.dia.value}
-          initialValid={formState.inputs.dia.isValid}
-        />
-        <Input
-          id="hora"
-          element="select"
-          options={[
-            { value: "7-9a.m", text: "7-9a.m" },
-            { value: "9-11.am", text: "9-11.am" },
-            { value: "11-1pm", text: "11-1pm" },
-            { value: "1-2pm", text: "1-2pm" },
-            { value: "2-4pm", text: "2-4pm" },
-            { value: "4-6pm", text: "4-6pm" },
-          ]}
-          label="Hora"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.hora.value}
-          initialValid={formState.inputs.hora.isValid}
-        />
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      <section className="main-content form">
+        {!isLoading && loadedSeccion && (
+          <form className="place-form" onSubmit={placeSubmitHandler}>
+            <Input
+              id="codigo"
+              element="input"
+              type="text"
+              label="Codigo"
+              validators={[
+                VALIDATOR_MINLENGTH(5),
+                VALIDATOR_MAXLENGTH(5),
+                VALIDATOR_NO_ESPECIAL_CHARACTER(),
+              ]}
+              errorText="Debe de ser de 5 caracteres no especiales."
+              onInput={inputHandler}
+              initialValue={loadedSeccion.codigo}
+              initialValid={true}
+            />
+            <Input
+              id="modalidad"
+              element="select"
+              options={[
+                { value: "presencial", text: "Presencial" },
+                { value: "virtual", text: "Virtual" },
+              ]}
+              label="Modalidad"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedSeccion.modalidad}
+              initialValid={true}
+            />
+            <Input
+              id="dia"
+              element="select"
+              options={[
+                { value: "lunes", text: "Lunes" },
+                { value: "martes", text: "Martes" },
+                { value: "miercoles", text: "Miercoles" },
+                { value: "jueves", text: "Jueves" },
+                { value: "viernes", text: "Viernes" },
+                { value: "sabado", text: "Sabado" },
+              ]}
+              label="Día"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedSeccion.dia}
+              initialValid={true}
+            />
+            <Input
+              id="hora"
+              element="select"
+              options={[
+                { value: "7-9a.m", text: "7-9a.m" },
+                { value: "9-11.am", text: "9-11.am" },
+                { value: "11-1pm", text: "11-1pm" },
+                { value: "1-2pm", text: "1-2pm" },
+                { value: "2-4pm", text: "2-4pm" },
+                { value: "4-6pm", text: "4-6pm" },
+              ]}
+              label="Hora"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedSeccion.hora}
+              initialValid={true}
+            />
 
-        <Input
-          id="profesor"
-          element="select"
-          options={[
-            { value: "p1", text: "Profesor 1" },
-            { value: "p2", text: "Profesor 2" },
-            { value: "p3", text: "Profesor 3" },
-          ]}
-          label="Profesor"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.profesor.value}
-          initialValid={formState.inputs.profesor.isValid}
-        />
-        <Input
-          id="curso"
-          element="select"
-          options={[
-            { value: "c1", text: "Curso 1" },
-            { value: "c2", text: "Curso 2" },
-            { value: "c3", text: "Curso 3" },
-          ]}
-          label="Curso"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Este campo es requerido"
-          onInput={inputHandler}
-          initialValue={formState.inputs.curso.value}
-          initialValid={formState.inputs.curso.isValid}
-        />
+            {profesores && <Input
+              id="profesor"
+              element="select"
+              options={profesores.map((profesor) => {
+                return {
+                  value: profesor._id,
+                  text: `${profesor.nombres} ${profesor.apellidos}`,
+                };
+              })}
+              label="Profesor"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedSeccion.profesor._id}
+              initialValid={true}
+            />}
+            {cursos && <Input
+              id="curso"
+              element="select"
+              options={cursos.map((curso) => {
+                return { value: curso._id, text: curso.nombre };
+              })}
+              label="Curso"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Este campo es requerido"
+              onInput={inputHandler}
+              initialValue={loadedSeccion.curso._id}
+              initialValid={true}
+            />}
 
-        <Button type="submit" disabled={!formState.isValid}>
-          ACTUALIZAR SECCIÓN
-        </Button>
-      </form>
-    </section>
+            <Button type="submit" disabled={!formState.isValid}>
+              ACTUALIZAR SECCIÓN
+            </Button>
+          </form>
+        )}
+      </section>
+    </>
   );
 };
 
