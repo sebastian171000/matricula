@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -81,7 +83,7 @@ const Administradores = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content">
+      <section className='main-content'>
         <FirstRow
           todosActive={todosActive}
           btn1Active={activosActive}
@@ -89,19 +91,19 @@ const Administradores = () => {
           onTodos={todosActiveHandler}
           onBtn1={activosActiveHandler}
           onBtn2={noactivossActiveHandler}
-          btn1="Activo"
-          btn2="Inactivo"
-          page="Administradores"
+          btn1='Activo'
+          btn2='Inactivo'
+          page='Administradores'
           total={filterList.length}
           style={{ width: "17rem" }}
         />
-        <SecondRow title="Administradores" to="/admin/new" />
+        <SecondRow title='Administradores' to='/admin/new' />
         <Table
           isLoading={isLoading}
           page={filterList}
           headerTable={[
             "nro. Documento",
-            "Username",
+            "Usuario",
             "Correo",
             "Estado",
             "Operación",
@@ -120,9 +122,9 @@ const Administradores = () => {
             estado: "Estado: ",
             permiso: "Tipo de permiso: ",
           }}
-          statusType="A"
+          statusType='A'
           tableKeys={["documento", "username", "email", "estado"]}
-          tableType="admin"
+          tableType='admin'
           onChangeStatus={changeStatusHandler}
         />
       </section>

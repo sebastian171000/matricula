@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import { useHistory } from "react-router-dom";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
@@ -42,10 +44,6 @@ const NewProfesor = () => {
         value: "",
         isValid: false,
       },
-      sexo: {
-        value: "",
-        isValid: false,
-      },
       telefono: {
         value: "",
         isValid: false,
@@ -75,7 +73,6 @@ const NewProfesor = () => {
           email: formState.inputs.email.value,
           tipoDoc: formState.inputs.tipoDoc.value,
           documento: formState.inputs.documento.value,
-          sexo: formState.inputs.sexo.value,
           telefono: formState.inputs.telefono.value,
           direccion: formState.inputs.direccion.value,
           linkedin: formState.inputs.linkedin.value,
@@ -90,115 +87,103 @@ const NewProfesor = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content form">
+      <section className='main-content form'>
         {isLoading && <LoadingSpinner asOverlay />}
-        <form className="place-form" onSubmit={placeSubmitHandler}>
+        <form className='place-form' onSubmit={placeSubmitHandler}>
           <Input
-            id="nombres"
-            element="input"
-            type="text"
-            label="Nombres"
+            id='nombres'
+            element='input'
+            type='text'
+            label='Nombres'
             validators={[
               VALIDATOR_MINLENGTH(3),
               VALIDATOR_MAXLENGTH(100),
               VALIDATOR_NO_ESPECIAL_CHARACTER(),
             ]}
-            errorText="Entre 3 y 100 caracteres no especiales"
+            errorText='Entre 3 y 100 caracteres no especiales'
             onInput={inputHandler}
           />
           <Input
-            id="apellidos"
-            element="input"
-            label="Apellidos"
+            id='apellidos'
+            element='input'
+            label='Apellidos'
             validators={[
               VALIDATOR_MINLENGTH(3),
               VALIDATOR_MAXLENGTH(100),
               VALIDATOR_NO_ESPECIAL_CHARACTER(),
             ]}
-            errorText="Entre 3 y 100 caracteres no especiales"
+            errorText='Entre 3 y 100 caracteres no especiales'
             onInput={inputHandler}
           />
           <Input
-            id="email"
-            element="input"
-            label="Correo"
+            id='email'
+            element='input'
+            label='Correo'
             validators={[VALIDATOR_EMAIL(), VALIDATOR_MAXLENGTH(30)]}
-            errorText="Tiene que tener el fomato de un correo y máximo 30 caracters"
+            errorText='Debe ser un correo gmail con un máximo de 30 caracteres'
             onInput={inputHandler}
           />
           <Input
-            id="tipoDoc"
-            element="select"
+            id='tipoDoc'
+            element='select'
             options={[
               { value: "dni", text: "DNI" },
               { value: "pasaporte", text: "Pasaporte" },
               { value: "extranjeria", text: "Carnet de extranjería" },
             ]}
-            label="Tipo de Documento"
+            label='Tipo de Documento'
             validators={[VALIDATOR_REQUIRE()]}
-            errorText="Este campo es requerido"
+            errorText='Este campo es requerido'
             onInput={inputHandler}
           />
           <Input
-            id="documento"
-            element="input"
-            type="text"
-            label="Número de documento"
+            id='documento'
+            element='input'
+            type='text'
+            label='Número de documento'
             validators={[
               VALIDATOR_MINLENGTH(8),
               VALIDATOR_MAXLENGTH(12),
               VALIDATOR_NUMBER(),
             ]}
-            errorText="Entre 8 y 12 caracteres no especiales."
+            errorText='Entre 8 y 12 caracteres no especiales.'
             onInput={inputHandler}
           />
           <Input
-            id="sexo"
-            element="select"
-            options={[
-              { value: "M", text: "M" },
-              { value: "F", text: "F" },
-            ]}
-            label="Sexo"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Este campo es requerido"
-            onInput={inputHandler}
-          />
-          <Input
-            id="telefono"
-            element="input"
-            type="text"
-            label="Teléfono"
+            id='telefono'
+            element='input'
+            type='text'
+            label='Teléfono'
             validators={[
               VALIDATOR_NUMBER(),
               VALIDATOR_MINLENGTH(9),
               VALIDATOR_MAXLENGTH(13),
             ]}
-            errorText="Entre 9 y 13 digitos."
+            errorText='Entre 9 y 13 digitos.'
             onInput={inputHandler}
           />
           <Input
-            id="direccion"
-            element="input"
-            type="text"
-            label="Dirección"
+            id='direccion'
+            element='input'
+            type='text'
+            label='Dirección'
             validators={[VALIDATOR_REQUIRE(), VALIDATOR_MAXLENGTH(100)]}
-            errorText="Entre 1 y 100 caracteres."
+            errorText='Entre 1 y 100 caracteres.'
             onInput={inputHandler}
           />
 
           <Input
-            id="linkedin"
-            element="input"
-            type="text"
-            label="Perfil de linkedin"
+            id='linkedin'
+            element='input'
+            type='text'
+            label='Perfil de linkedin'
             validators={[]}
-            errorText=""
+            errorText=''
             onInput={inputHandler}
             initialValid={true}
           />
 
-          <Button type="submit" disabled={!formState.isValid}>
+          <Button type='submit' disabled={!formState.isValid}>
             AÑADIR PROFESOR
           </Button>
         </form>

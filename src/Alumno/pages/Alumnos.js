@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useState, useEffect } from "react";
 
 import FirstRow from "../../shared/components/PageRows/FirstRow";
@@ -54,7 +56,7 @@ const Alumnos = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content">
+      <section className='main-content'>
         <FirstRow
           todosActive={todosActive}
           btn1Active={matriculadosActive}
@@ -62,12 +64,12 @@ const Alumnos = () => {
           onTodos={todosActiveHandler}
           onBtn1={matriculadosActiveHandler}
           onBtn2={noMatriculadossActiveHandler}
-          btn1="Matriculados"
-          btn2="No Matriculados"
-          page="Alumnos"
+          btn1='Matriculados'
+          btn2='No Matriculados'
+          page='Alumnos'
           total={filterList.length}
         />
-        <SecondRow title="Alumnos" to="/alumno/new" />
+        <SecondRow title='Alumnos' to='/alumno/new' />
 
         <Table
           isLoading={isLoading}
@@ -83,6 +85,7 @@ const Alumnos = () => {
           labelsModal={{
             tipoDoc: "Tipo de documento:",
             documento: "Número de Documento",
+            semestre: "Semestre",
             nombres: "Nombres:",
             apellidos: "Apellidos",
             sexo: "Sexo:",
@@ -92,9 +95,9 @@ const Alumnos = () => {
             ciclo: "Ciclo",
             estado: "Estado: ",
           }}
-          statusType="M"
+          statusType='M'
           tableKeys={["documento", "email", "estado"]}
-          tableType="alumno"
+          tableType='alumno'
         />
       </section>
     </>

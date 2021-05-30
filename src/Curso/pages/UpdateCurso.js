@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
@@ -101,7 +103,7 @@ const UpdateProfesor = () => {
 
   if (isLoading) {
     return (
-      <div style={{ position: "relative" }} className="center">
+      <div style={{ position: "relative" }} className='center'>
         <LoadingSpinner asOverlay />
       </div>
     );
@@ -109,7 +111,7 @@ const UpdateProfesor = () => {
 
   if (!loadedCurso && !error) {
     return (
-      <div className="center">
+      <div className='center'>
         <Card>
           <h2>No pudimos identificar el curso!</h2>
         </Card>
@@ -120,67 +122,67 @@ const UpdateProfesor = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content form">
+      <section className='main-content form'>
         {!isLoading && loadedCurso && (
-          <form className="place-form" onSubmit={placeSubmitHandler}>
+          <form className='place-form' onSubmit={placeSubmitHandler}>
             <Input
-              id="codigo"
-              element="input"
-              type="text"
-              label="Codigo"
+              id='codigo'
+              element='input'
+              type='text'
+              label='Codigo'
               validators={[
                 VALIDATOR_MINLENGTH(5),
                 VALIDATOR_MAXLENGTH(5),
                 VALIDATOR_NO_ESPECIAL_CHARACTER(),
               ]}
-              errorText="Debe de ser de 5 caracteres no especiales."
+              errorText='Debe de ser de 5 caracteres no especiales.'
               onInput={inputHandler}
               initialValue={loadedCurso.codigo}
               initialValid={true}
             />
             <Input
-              id="ciclo"
-              element="input"
-              type="number"
-              label="Ciclo Académico"
+              id='ciclo'
+              element='input'
+              type='number'
+              label='Ciclo Académico'
               validators={[
                 VALIDATOR_NUMBER(),
                 VALIDATOR_MIN(1),
                 VALIDATOR_MAX(14),
               ]}
-              errorText="Sólo números del 1 al 14."
+              errorText='Solo números del 1 al 14.'
               onInput={inputHandler}
               initialValue={loadedCurso.ciclo}
               initialValid={true}
             />
 
             <Input
-              id="nombre"
-              element="input"
-              label="Nombre"
+              id='nombre'
+              element='input'
+              label='Nombre'
               validators={[VALIDATOR_MINLENGTH(5), VALIDATOR_MAXLENGTH(100)]}
-              errorText="Tiene que tener 5 a 100 caracteres"
+              errorText='Tiene que tener 5 a 100 caracteres'
               onInput={inputHandler}
               initialValue={loadedCurso.nombre}
               initialValid={true}
             />
             <Input
-              id="creditos"
-              element="input"
-              type="number"
-              label="Creditos"
+              id='creditos'
+              element='input'
+              type='number'
+              label='Creditos'
               validators={[
                 VALIDATOR_NUMBER(),
                 VALIDATOR_MIN(3),
                 VALIDATOR_MAX(6),
               ]}
-              errorText="Sólo números del 3 al 6"
+              errorText='Solo números del 3 al 6'
               onInput={inputHandler}
               initialValue={loadedCurso.creditos}
               initialValid={true}
             />
 
-            <Button type="submit" disabled={!formState.isValid}>
+            <Button type='submit' disabled={!formState.isValid}>
               ACTUALIZAR CURSO
             </Button>
           </form>

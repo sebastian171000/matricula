@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useContext } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
 import { useHistory } from "react-router-dom";
@@ -69,59 +71,59 @@ const NewCurso = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content form">
+      <section className='main-content form'>
         {isLoading && <LoadingSpinner asOverlay />}
-        <form className="place-form" onSubmit={placeSubmitHandler}>
+        <form className='place-form' onSubmit={placeSubmitHandler}>
           <Input
-            id="codigo"
-            element="input"
-            type="text"
-            label="Codigo"
+            id='codigo'
+            element='input'
+            type='text'
+            label='Codigo'
             validators={[
               VALIDATOR_MINLENGTH(5),
               VALIDATOR_MAXLENGTH(5),
               VALIDATOR_NO_ESPECIAL_CHARACTER(),
             ]}
-            errorText="Debe de ser de 5 caracteres no especiales."
+            errorText='Debe de ser de 5 caracteres no especiales.'
             onInput={inputHandler}
           />
           <Input
-            id="ciclo"
-            element="input"
-            type="number"
-            label="Ciclo Académico"
+            id='ciclo'
+            element='input'
+            type='number'
+            label='Ciclo Académico'
             validators={[
               VALIDATOR_NUMBER(),
               VALIDATOR_MIN(1),
               VALIDATOR_MAX(14),
             ]}
-            errorText="Sólo números del 1 al 14."
+            errorText='Solo números del 1 al 14.'
             onInput={inputHandler}
           />
 
           <Input
-            id="nombre"
-            element="input"
-            label="Nombre"
+            id='nombre'
+            element='input'
+            label='Nombre'
             validators={[VALIDATOR_MINLENGTH(5), VALIDATOR_MAXLENGTH(100)]}
-            errorText="Tiene que tener 5 a 100 caracteres"
+            errorText='Tiene que tener 5 a 100 caracteres'
             onInput={inputHandler}
           />
           <Input
-            id="creditos"
-            element="input"
-            type="number"
-            label="Creditos"
+            id='creditos'
+            element='input'
+            type='number'
+            label='Creditos'
             validators={[
               VALIDATOR_NUMBER(),
               VALIDATOR_MIN(3),
               VALIDATOR_MAX(6),
             ]}
-            errorText="Sólo números del 3 al 6"
+            errorText='Solo números del 3 al 6'
             onInput={inputHandler}
           />
 
-          <Button type="submit" disabled={!formState.isValid}>
+          <Button type='submit' disabled={!formState.isValid}>
             AÑADIR CURSO
           </Button>
         </form>

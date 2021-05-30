@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 
 import Modal from "./Modal";
@@ -7,10 +9,9 @@ const ErrorModal = (props) => {
   return (
     <Modal
       onCancel={props.onClear}
-      header="Oops, hay un problema!"
+      header='Oops, hay un problema!'
       show={!!props.error}
-      footer={<Button onClick={props.onClear}>Okay</Button>}
-    >
+      footer={<Button onClick={props.onClear}>Okay</Button>}>
       <p>{props.error}</p>
     </Modal>
   );

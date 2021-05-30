@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
@@ -11,6 +13,7 @@ import {
   VALIDATOR_NO_ESPECIAL_CHARACTER,
   VALIDATOR_NUMBER,
   VALIDATOR_PASSWORD,
+  VALIDATOR_PASSWORD_EDIT,
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import "../../shared/components/FormElements/PlaceForm.css";
@@ -136,7 +139,7 @@ const UpdateAdministrador = () => {
   };
   if (isLoading) {
     return (
-      <div className="center">
+      <div className='center'>
         <LoadingSpinner asOverlay />
       </div>
     );
@@ -144,7 +147,7 @@ const UpdateAdministrador = () => {
 
   if (!loadedAdmin && !error) {
     return (
-      <div className="center">
+      <div className='center'>
         <Card>
           <h2>No pudimos identificar al administrador!</h2>
         </Card>
@@ -154,121 +157,122 @@ const UpdateAdministrador = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content form">
+      <section className='main-content form'>
         {!isLoading && loadedAdmin && (
-          <form className="place-form" onSubmit={placeSubmitHandler}>
+          <form className='place-form' onSubmit={placeSubmitHandler}>
             <Input
-              id="username"
-              element="input"
-              type="text"
-              label="Username"
+              id='username'
+              element='input'
+              type='text'
+              label='Username'
               validators={[
                 VALIDATOR_MINLENGTH(5),
                 VALIDATOR_MAXLENGTH(9),
                 VALIDATOR_NO_ESPECIAL_CHARACTER(),
               ]}
-              errorText="Entre 5 a 9 caracteres no especiales."
+              errorText='Entre 5 a 9 caracteres no especiales.'
               onInput={inputHandler}
               initialValue={loadedAdmin.username}
               initialValid={true}
             />
             <Input
-              id="password"
-              element="input"
-              type="password"
-              label="Contraseña"
-              validators={[VALIDATOR_PASSWORD()]}
-              errorText="Entre 8 y 16 caracteres, al menos 1 digito, minuscula y mayúscula."
+              id='password'
+              element='input'
+              type='password'
+              label='Contraseña'
+              validators={[VALIDATOR_PASSWORD_EDIT()]}
+              errorText='Entre 8 y 16 caracteres, al menos 1 digito, minuscula y mayúscula.'
               onInput={inputHandler}
               initialValue={""}
-              initialValid={false}
+              initialValid={true}
             />
+            <p>*Deje el campo contraseña vacía si no desea editarla</p>
             <Input
-              id="nombres"
-              element="input"
-              type="text"
-              label="Nombres"
+              id='nombres'
+              element='input'
+              type='text'
+              label='Nombres'
               validators={[
                 VALIDATOR_MINLENGTH(3),
                 VALIDATOR_MAXLENGTH(100),
                 VALIDATOR_NO_ESPECIAL_CHARACTER(),
               ]}
-              errorText="Entre 3 y 100 caracters no especiales."
+              errorText='Entre 3 y 100 caracteres no especiales.'
               onInput={inputHandler}
               initialValue={loadedAdmin.nombres}
               initialValid={true}
             />
             <Input
-              id="apellidos"
-              element="input"
-              label="Apellidos"
+              id='apellidos'
+              element='input'
+              label='Apellidos'
               validators={[
                 VALIDATOR_MINLENGTH(3),
                 VALIDATOR_MAXLENGTH(100),
                 VALIDATOR_NO_ESPECIAL_CHARACTER(),
               ]}
-              errorText="Entre 3 y 100 caracters no especiales."
+              errorText='Entre 3 y 100 caracteres no especiales.'
               onInput={inputHandler}
               initialValue={loadedAdmin.apellidos}
               initialValid={true}
             />
             <Input
-              id="email"
-              element="input"
-              label="Correo"
+              id='email'
+              element='input'
+              label='Correo'
               validators={[VALIDATOR_EMAIL(), VALIDATOR_MAXLENGTH(30)]}
-              errorText="Tiene que tener el fomato de un correo y máximo 30 caracters"
+              errorText='Debe ser un correo gmail con un máximo de 30 caracteres'
               onInput={inputHandler}
               initialValue={loadedAdmin.email}
               initialValid={true}
             />
             <Input
-              id="tipoDoc"
-              element="select"
+              id='tipoDoc'
+              element='select'
               options={[
                 { value: "dni", text: "DNI" },
                 { value: "pasaporte", text: "Pasaporte" },
                 { value: "extranjeria", text: "Carnet de extranjería" },
               ]}
-              label="Tipo de Documento"
+              label='Tipo de Documento'
               validators={[VALIDATOR_REQUIRE()]}
-              errorText="Este campo es requerido"
+              errorText='Este campo es requerido'
               onInput={inputHandler}
               initialValue={loadedAdmin.tipoDoc}
               initialValid={true}
             />
             <Input
-              id="documento"
-              element="input"
-              type="text"
-              label="Número de documento"
+              id='documento'
+              element='input'
+              type='text'
+              label='Número de documento'
               validators={[
                 VALIDATOR_MINLENGTH(8),
                 VALIDATOR_MAXLENGTH(12),
                 VALIDATOR_NUMBER(),
               ]}
-              errorText="Entre 8 y 12 caracters no especiales."
+              errorText='Entre 8 y 12 caracteres no especiales.'
               onInput={inputHandler}
               initialValue={loadedAdmin.documento}
               initialValid={true}
             />
             <Input
-              id="telefono"
-              element="input"
-              type="text"
-              label="Teléfono"
+              id='telefono'
+              element='input'
+              type='text'
+              label='Teléfono'
               validators={[
                 VALIDATOR_NUMBER(),
                 VALIDATOR_MINLENGTH(9),
                 VALIDATOR_MAXLENGTH(13),
               ]}
-              errorText="Entre 9 y 13 digitos."
+              errorText='Entre 9 y 13 digitos.'
               onInput={inputHandler}
               initialValue={loadedAdmin.telefono}
               initialValid={true}
             />
 
-            <Button type="submit" disabled={!formState.isValid}>
+            <Button type='submit' disabled={!formState.isValid}>
               ACTUALIZAR ADMINISTRADOR
             </Button>
           </form>

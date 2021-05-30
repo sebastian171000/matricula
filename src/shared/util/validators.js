@@ -1,3 +1,5 @@
+/** @format */
+
 const VALIDATOR_TYPE_REQUIRE = "REQUIRE";
 const VALIDATOR_TYPE_MINLENGTH = "MINLENGTH";
 const VALIDATOR_TYPE_MAXLENGTH = "MAXLENGTH";
@@ -8,9 +10,13 @@ const VALIDATOR_TYPE_FILE = "FILE";
 const VALIDATOR_TYPE_NO_SPECIAL_CHARACTER = "NO_ESPECIAL_CHARACTER";
 const VALIDATOR_TYPE_NUMBER = "NUMBER";
 const VALIDATOR_TYPE_PASSWORD = "PASSWORD";
+const VALIDATOR_TYPE_PASSWORD_EDIT = "PASSWORD_EDIT";
 
 export const VALIDATOR_REQUIRE = () => ({ type: VALIDATOR_TYPE_REQUIRE });
 export const VALIDATOR_PASSWORD = () => ({ type: VALIDATOR_TYPE_PASSWORD });
+export const VALIDATOR_PASSWORD_EDIT = () => ({
+  type: VALIDATOR_TYPE_PASSWORD_EDIT,
+});
 
 export const VALIDATOR_FILE = () => ({ type: VALIDATOR_TYPE_FILE });
 export const VALIDATOR_MINLENGTH = (val) => ({
@@ -51,7 +57,7 @@ export const validate = (value, validators) => {
       isValid = isValid && /^\S+@gmail+\.\S+$/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_NO_SPECIAL_CHARACTER) {
-      isValid = isValid && !/[0-9!@#$%^&*()_+\-=\][/{};':"\\|,.<>?]+/.test(value);
+      isValid = isValid && !/[!@#$%^&*()_+\-=\][/{};':"\\|,.<>?]+/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_NUMBER) {
       isValid = isValid && /^\d+$/.test(value);
@@ -59,6 +65,12 @@ export const validate = (value, validators) => {
     if (validator.type === VALIDATOR_TYPE_PASSWORD) {
       isValid =
         isValid && /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/.test(value);
+    }
+    if (validator.type === VALIDATOR_TYPE_PASSWORD_EDIT) {
+      isValid =
+        (isValid &&
+          /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/.test(value)) ||
+        value == "";
     }
   }
   return isValid;

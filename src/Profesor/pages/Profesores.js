@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -72,7 +74,7 @@ const Profesores = () => {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <section className="main-content">
+      <section className='main-content'>
         {/* {isLoading && (
           <div className="center">
             <LoadingSpinner asOverlay />
@@ -85,13 +87,13 @@ const Profesores = () => {
           onTodos={todosActiveHandler}
           onBtn1={activosActiveHandler}
           onBtn2={noactivossActiveHandler}
-          btn1="Activo"
-          btn2="Inactivo"
-          page="Profesores"
+          btn1='Activo'
+          btn2='Inactivo'
+          page='Profesores'
           total={filterList.length}
           style={{ width: "17rem" }}
         />
-        <SecondRow title="Profesores" to="/profesor/new" />
+        <SecondRow title='Profesores' to='/profesor/new' />
         <Table
           isLoading={isLoading}
           page={filterList}
@@ -108,16 +110,15 @@ const Profesores = () => {
             documento: "Número de Documento",
             nombres: "Nombres:",
             apellidos: "Apellidos",
-            sexo: "Sexo:",
             email: "Correo:",
             telefono: "Telefono",
             direccion: "Direccion: ",
             estado: "Estado: ",
             linkedin: "Linkedin: ",
           }}
-          statusType="A"
+          statusType='A'
           tableKeys={["documento", "email", "estado"]}
-          tableType="profesor"
+          tableType='profesor'
           onChangeStatus={changeStatusHandler}
         />
       </section>
